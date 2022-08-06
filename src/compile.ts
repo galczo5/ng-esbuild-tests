@@ -1,4 +1,6 @@
 import { build } from 'esbuild';
+import { componentMetadataPlugin } from './componentMetadataPlugin';
+import { jestPresetAngularPlugin } from './jestPresetAngularPlugin';
 
 export async function compile(outDir: string, paths: Array<string>) {
 	const start = new Date().getTime();
@@ -7,10 +9,16 @@ export async function compile(outDir: string, paths: Array<string>) {
 		outdir: outDir,
 		entryPoints: paths,
 		bundle: true,
-		sourcemap: true,
 		platform: 'node',
 		minify: false,
-		format: 'iife'
+		format: 'iife',
+		plugins: [
+			componentMetadataPlugin(),
+			jestPresetAngularPlugin()
+		],
+		loader: {
+			'.html': 'text'
+		}
 	});
 
 	const end = new Date().getTime();
