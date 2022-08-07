@@ -9,6 +9,7 @@ program
 	.option('--dir [dir]', 'directory to scan, default: current directory')
 	.option('--pattern [pattern]', 'file pattern, default: ./**/*spec.ts')
 	.option('--outDir [outDir]', 'output directory, default: ./dist/ng-esbuild-tests/')
+	.option('--skipCompile', 'skip compilation part, only for tests!')
 	.parse(process.argv);
 
 export async function cli() {
@@ -16,17 +17,21 @@ export async function cli() {
 	const dir = opts.dir || './';
 	const pattern = opts.pattern || '**/*spec.ts';
 	const outDir = opts.outDir || './dist/ng-esbuild-tests/';
+	const skipCompile = opts.skipCompile || '';
 
 	const paths = await getPaths(dir, pattern);
 
-	console.log('Files to compile with esbuild:');
+	if (!skipCompile) {
+		console.log('Files to compile with esbuild:');
+		// eslint-disable-next-line no-restricted-syntax
+		for (const path of paths) {
+			console.log(`  ${path}`);
+		}
 
-	// eslint-disable-next-line no-restricted-syntax
-	for (const path of paths) {
-		console.log(`  ${path}`);
+		await compile(outDir, paths);
+	} else {
+		console.warn('Compilation skipped!');
 	}
-
-	await compile(outDir, paths);
 
 	const args = {
 		roots: ['./'],
