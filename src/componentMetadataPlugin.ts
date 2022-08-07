@@ -1,5 +1,9 @@
 import * as fs from 'fs';
-import { Plugin, PluginBuild } from 'esbuild';
+import {
+	Loader, OnLoadResult, Plugin, PluginBuild
+} from 'esbuild';
+
+const tsLoader: Loader = 'ts';
 
 const styleUrlsRegExp = /^ *styleUrls *: *\[['"]([^'"\]]*)['"]],*/gm;
 const templateUrlRegExp = /^ *templateUrl *: *['"]*([^'"]*)['"]/gm;
@@ -20,7 +24,7 @@ async function removeStyles(contents: string) {
 	return contents.replace(styleUrlsRegExp, 'styles: [],');
 }
 
-async function processComponentMetadata(source: string) {
+async function processComponentMetadata(source: string): Promise<OnLoadResult> {
 	try {
 		let result = source;
 		const hasTemplateUrl = /^ *templateUrl *: *['"]*([^'"]*)/gm.test(result);
@@ -36,7 +40,7 @@ async function processComponentMetadata(source: string) {
 			result = await removeStyles(result || '');
 		}
 
-		return { contents: result, loader: 'ts' } as any;
+		return { contents: result, loader: tsLoader };
 	} catch (e) {
 		return { errors: [e] };
 	}
