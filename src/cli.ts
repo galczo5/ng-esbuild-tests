@@ -10,6 +10,7 @@ program
 	.option('--pattern [pattern]', 'file pattern, default: ./**/*spec.ts')
 	.option('--outDir [outDir]', 'output directory, default: ./dist/ng-esbuild-tests/')
 	.option('--skipCompile', 'skip compilation part, only for tests!')
+	.option('--experimental', 'use experimental plugins, not necessary if you write tests without TestBed')
 	.parse(process.argv);
 
 export async function cli() {
@@ -17,7 +18,8 @@ export async function cli() {
 	const dir = opts.dir || './';
 	const pattern = opts.pattern || '**/*spec.ts';
 	const outDir = opts.outDir || './dist/ng-esbuild-tests/';
-	const skipCompile = opts.skipCompile || '';
+	const skipCompile = Boolean(opts.skipCompile || '');
+	const experimental = Boolean(opts.experimental || '');
 
 	const paths = await getPaths(dir, pattern);
 
@@ -28,7 +30,7 @@ export async function cli() {
 			console.log(`  ${path}`);
 		}
 
-		await compile(outDir, paths);
+		await compile(outDir, paths, experimental);
 	} else {
 		console.warn('Compilation skipped!');
 	}

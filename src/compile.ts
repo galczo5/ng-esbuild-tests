@@ -2,8 +2,21 @@ import { build } from 'esbuild';
 import { componentMetadataPlugin } from './componentMetadataPlugin';
 import { jestPresetAngularPlugin } from './jestPresetAngularPlugin';
 
-export async function compile(outDir: string, paths: Array<string>) {
+export async function compile(
+	outDir: string,
+	paths: Array<string>,
+	usePlugins: boolean
+) {
 	const start = new Date().getTime();
+
+	const plugins = [];
+
+	if (usePlugins) {
+		plugins.push(
+			componentMetadataPlugin(),
+			jestPresetAngularPlugin()
+		);
+	}
 
 	const result = await build({
 		outdir: outDir,
@@ -12,10 +25,7 @@ export async function compile(outDir: string, paths: Array<string>) {
 		platform: 'node',
 		minify: false,
 		format: 'iife',
-		plugins: [
-			componentMetadataPlugin(),
-			jestPresetAngularPlugin()
-		],
+		plugins,
 		loader: {
 			'.html': 'text'
 		}
