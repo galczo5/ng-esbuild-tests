@@ -1,6 +1,6 @@
 {
   "name": "ng-esbuild-tests",
-  "version": "1.0.6",
+  "version": "1.0.14",
   "description": "Run Angular tests faster",
   "main": "index.js",
   "scripts": {

@@ -1,5 +1,6 @@
 import { program } from 'commander';
 import { runCLI } from 'jest';
+import { promises } from 'fs';
 import { getPaths } from './getPaths';
 import { compile } from './compile';
 
@@ -35,11 +36,19 @@ export async function cli() {
 		console.warn('Compilation skipped!');
 	}
 
-	const args = {
-		roots: ['./'],
-		testRegex: '\\.spec\\.js$',
-		testEnvironment: 'jsdom'
-	};
+	const args = `
+export default {
+	roots: ['./'],
+	testRegex: '.spec.js$',
+	testEnvironment: 'jsdom'
+}`;
 
-	await runCLI(args as any, [outDir]);
+	// eslint-disable-next-line no-magic-numbers
+	await promises.writeFile('./jest.config.js', JSON.stringify(args, null, 2));
+
+	await runCLI({
+		roots: ['./'],
+		testRegex: '.spec.js$',
+		testEnvironment: 'jsdom'
+	} as any, [outDir]);
 }
